@@ -1,6 +1,10 @@
 @icon("res://addons/PlayerBody2D/ico.png")
 class_name PlayerBody2D
 extends CharacterBody2D
+@export_group("Animation")
+@export var Animate:bool
+@export var AnimName:Dictionary = {Idle = "", Walk = "", Run = "", Jump = ""}
+@export var PlayerAnimatedSprite:AnimatedSprite2D
 # --- SPRITES ---
 @export var Sprites: Array[Sprite2D]
 
@@ -90,6 +94,8 @@ func _process(delta: float) -> void:
 
 	if ApplyGravity and CharacterType == 0:
 		apply_gravity(delta)
+	if Animate:
+		animate()
 
 # --- MOVEMENT HANDLERS ---
 func handle_top_down_movement():
@@ -162,3 +168,11 @@ func handle_jump():
 func apply_gravity(delta):
 	if not is_on_floor():
 		velocity += get_gravity() * Gforce * delta
+
+func animate():
+	if velocity == Vector2.ZERO:
+		PlayerAnimatedSprite.play(AnimName.Idle)
+	elif velocity.y != 0 and CharacterType == 0:
+		PlayerAnimatedSprite.play(AnimName.Jump)
+	else:
+		PlayerAnimatedSprite.play(AnimName.Run if running else AnimName.Walk)
